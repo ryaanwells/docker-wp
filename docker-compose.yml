@@ -4,6 +4,8 @@ services:
         image: nginx:mainline
         volumes:
             - ".docker/nginx.template:/etc/nginx/conf.d/wordpress.template:ro"
+            - "./certs/server.crt:/etc/ssl/localhost.crt:ro"
+            - "./certs/server.key:/etc/ssl/localhost.key:ro"
         volumes_from:
             - php
         links:
@@ -20,11 +22,12 @@ services:
         links:
             - mysql
             - memcached
+            - "graphite-statsd:statsd"
         volumes:
             - "./wp-config:/var/www/html/wp-config:ro"
             - "./wp-content/mu-plugins:/var/www/html/wp-content/mu-plugins:ro"
-            - "../wp-content/plugins:/var/www/html/wp-content/plugins:rw"
-            - "../wp-content/themes:/var/www/html/wp-content/themes:rw"
+            - "./wp-content/plugins:/var/www/html/wp-content/plugins:rw"
+            - "./wp-content/themes:/var/www/html/wp-content/themes:rw"
             - "./wp-content/uploads:/var/www/html/wp-content/uploads:rw"
             - "./wp-content/sunrise.php:/var/www/html/wp-content/sunrise.php:ro"
             - "./wp-content/object-cache.php:/var/www/html/wp-content/object-cache.php:ro"
@@ -70,3 +73,12 @@ services:
         image: namshi/smtp
         environment:
             MAILNAME: ${MAILNAME}
+
+    graphite-statsd:
+        image: graphiteapp/graphite-statsd
+        ports:
+            - 8080:80
+            - 2003-2004:2003-2004
+            - 2023-2024:2023-2024
+            - 8125:8125/udp
+            - 8126:8126

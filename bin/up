@@ -4,6 +4,9 @@ DIR=$(cd `dirname $0` && cd .. && pwd)
 
 cd $DIR
 git submodule update --init --recursive
+# Ensure the SSL certificate is available before starting docker otherwise
+# the volumes will fail to resolve.
+./bin/generate_cert
 docker-compose pull \
 	&& docker-compose stop php && docker-compose rm -v --force php wpcli nginx \
 	&& docker-compose up -d

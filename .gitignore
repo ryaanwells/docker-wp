@@ -11,3 +11,6 @@ wp-config/000-secrets.php
 
 # Docker override
 docker-compose.override.yml
+
+# Local certificates
+certs
