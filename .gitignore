@@ -2,6 +2,7 @@ wp-content/plugins
 wp-content/themes
 wp-content/uploads
 wp-config/000-secrets.php
+wp-content/vendor
 
 # Environment variables
 .env

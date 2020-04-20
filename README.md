@@ -30,3 +30,39 @@ Once that completes, go to `http://localhost:8000/` to install WordPress.
 ```
 docker-wp/bin/up
 ```
+
+## Sample dashboard
+This repo provides a demonstration of how we could get metrics out of WordPress using StatsD. After running `./bin/up` and setting up your site, navigate to `http://localhost:8081/dashboard`, go `Dashboard > Edit Dashboard` and paste the following:
+```
+[
+  {
+    "target": [
+      "stats.timers.wordpress.admin_web_transaction.upper"
+    ],
+    "fontSize": "16",
+    "hideLegend": "true",
+    "drawNullAsZero": "true",
+    "yUnitSystem": "msec",
+    "title": "admin_web_transaction.upper"
+  },
+  {
+    "target": [
+      "stats.timers.wordpress.web_transaction.upper"
+    ],
+    "fontSize": "16",
+    "hideLegend": "true",
+    "drawNullAsZero": "true",
+    "yUnitSystem": "msec",
+    "title": "web_transaction.upper"
+  },
+  {
+    "target": [
+      "stats.wordpress.status_code.200"
+    ],
+    "fontSize": "16",
+    "hideLegend": "true",
+    "drawNullAsZero": "true",
+    "title": "status_code.200"
+  }
+]
+```
