@@ -1,0 +1,51 @@
+#!/bin/bash
+
+CERT_DIR="certs"
+ROOTCA_KEY="$CERT_DIR/rootCA.key"
+ROOTCA_PEM="$CERT_DIR/rootCA.pem"
+SERVER_CSR="$CERT_DIR/server.csr"
+SERVER_KEY="$CERT_DIR/server.key"
+SERVER_CRT="$CERT_DIR/server.crt"
+
+if [ ! -d "$CERT_DIR" ]; then
+    mkdir $CERT_DIR
+fi
+
+echo "Root certificate (key):"
+if [ ! -f "$ROOTCA_KEY" ]; then
+    echo -e "\tGenerating Root key"
+    openssl genrsa -des3 -passout pass:password -out $ROOTCA_KEY 2048
+    echo -e "\tRoot key generated!\n"
+else
+    echo -e "\tRoot key exists, not regenerating.\n"
+fi
+
+echo "Root certificate (pem):"
+if [ ! -f "$ROOTCA_PEM" ]; then
+    echo -e "\tGenerating Root pem"
+    openssl req -x509 -new -nodes -key $ROOTCA_KEY -sha256 -days 1024 -passin pass:password -passout pass:password -config bin/config/wordpress.csr.cnf -out $ROOTCA_PEM
+    echo -e "\tRoot pem generated!\n"
+else
+    echo -e "\tRoot pem exists, not regenerating.\n"
+fi
+
+echo "Server csr and key:"
+if [ ! -f "$SERVER_CSR" ]; then
+    echo -e "\tGenerating Server csr and key"
+    openssl req -new -sha256 -nodes -out $SERVER_CSR -newkey rsa:2048 -passin pass:password -keyout $SERVER_KEY -config <( cat bin/config/wordpress.csr.cnf )
+    echo -e "\tServer csr and key generated!\n"
+else
+    echo -e "\tServer csr and key exist, not regenerating.\n"
+fi
+
+echo "Server crt:"
+if [ ! -f "$SERVER_CRT" ]; then
+    echo -e "\tGenerating Server crt"
+    openssl x509 -req -in $SERVER_CSR -CA $ROOTCA_PEM -CAkey $ROOTCA_KEY -CAcreateserial -out $SERVER_CRT -passin pass:password -days 500 -sha256 -extfile bin/config/v3.ext
+    echo -e "\tServer crt generated!\n"
+else
+    echo -e "\tServer crt exists, not regenerating.\n"
+fi
+
+echo -e "Done!"
+echo -e "Make sure to trust $ROOTCA_PEM, easy method on OSX is 'open $ROOTCA_PEM' and set to 'Always Trust'.\n"

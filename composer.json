@@ -1,0 +1,9 @@
+{
+    "type": "project",
+    "require": {
+        "domnikl/statsd": "~3.0"
+    },
+    "config": {
+        "vendor-dir": "wp-content/vendor"
+    }
+}
